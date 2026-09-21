@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIBE FASHION — لوحة الإدارة</title>
+<title>VIBE PHARMACY — لوحة إدارة الصيدلية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -16,27 +16,25 @@
   :root{
     --black:#101012;
     --white:#ffffff;
-    --accent:#ff4b26;
+    --accent:#0d9488; /* تغيير اللون الأساسي إلى الأخضر التهدئي/الطبي */
+    --accent-dark:#0f766e;
     --gray:#6b6b70;
     --gray-light:#f2f2f3;
     --line: rgba(16,16,18,0.08);
     --line-strong: rgba(16,16,18,0.16);
     --page-bg:#e9e9ea;
     --shell-w: 1100px;
+    --in-stock: #16a34a;
+    --out-stock: #dc2626;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    background:var(--page-bg);
-    color:var(--black);
-    font-family:'Cairo', sans-serif;
-    padding:30px 16px 60px;
-    min-height:100vh;
+    background:var(--page-bg); color:var(--black); font-family:'Cairo', sans-serif;
+    padding:30px 16px 60px; min-height:100vh;
   }
   a{color:inherit; text-decoration:none;}
   button{font-family:inherit; cursor:pointer;}
-
   .admin-shell{max-width:var(--shell-w); margin:0 auto;}
-
   .login-box{max-width:400px; margin:60px auto 0; background:var(--white); padding:26px; border-radius:16px;}
   .login-box h2{font-size:24px; font-weight:900; margin-bottom:6px;}
   .login-box p{color:var(--gray); font-size:13.5px; margin-bottom:24px;}
@@ -48,18 +46,37 @@
     color:var(--black); padding:12px 14px; font-family:inherit; font-size:14px; outline:none; border-radius:10px;
   }
   .field input:focus, .field textarea:focus{border-color:var(--accent);}
-  .field textarea{min-height:100px; resize:vertical;}
-  .error-msg{color:#e0401e; font-size:12.5px; margin-top:8px; display:none; font-weight:700;}
+  .field textarea{min-height:80px; resize:vertical;}
+  
+  /* تمييز حقل الاسم العلمي */
+  .field-scientific input{
+    border: 2px solid var(--accent);
+    background-color: #f0fdf4;
+    font-weight: 700;
+    color: var(--accent-dark);
+  }
 
+  .error-msg{color:#e0401e; font-size:12.5px; margin-top:8px; display:none; font-weight:700;}
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     padding:12px 20px; border-radius:10px; font-size:14px; font-weight:800; border:none; cursor:pointer;
   }
-  .btn.solid{background:var(--black); color:var(--white);}
+  .btn.solid{background:var(--accent); color:var(--white);}
   .btn.ghost{border:1px solid var(--line-strong); color:var(--gray); background:none;}
-  .btn.danger{background:#e0401e; color:var(--white);}
+  .btn.danger{background:#dc2626; color:var(--white);}
   .btn.small{padding:6px 12px; font-size:12px;}
   .btn.wide{width:100%;}
+
+  /* تمييز خيار التوفر */
+  .stock-checkbox-wrap{
+    display:flex; align-items:center; gap:12px; background: #fff; padding: 12px;
+    border-radius: 10px; border: 2px dashed var(--line-strong); margin-bottom: 16px;
+  }
+  .stock-status-badge{
+    font-size: 14px; font-weight: 900; padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
+  }
+  .stock-status-badge.available{ background: #dcfce7; color: var(--in-stock); }
+  .stock-status-badge.unavailable{ background: #fee2e2; color: var(--out-stock); }
 
   .admin-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;}
   .admin-header h2{font-size:22px; font-weight:900;}
@@ -77,8 +94,9 @@
   .admin-list .row{display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line);}
   .admin-list .row img{width:46px; height:56px; object-fit:cover; background:var(--gray-light); border-radius:8px;}
   .admin-list .row .rinfo{flex:1;}
-  .admin-list .row .rinfo .rn{font-size:14px; font-weight:700;}
-  .admin-list .row .rinfo .rp{font-size:12.5px; color:var(--accent); font-weight:800;}
+  .admin-list .row .rinfo .rn{font-size:14px; font-weight:800;}
+  .admin-list .row .rinfo .sci{font-size:12.5px; color:var(--accent-dark); font-weight:700;}
+  .admin-list .row .rinfo .rp{font-size:13px; color:var(--black); font-weight:800;}
 
   #dashboard{ display:none; }
   @media (min-width:900px){
@@ -98,10 +116,10 @@
 
 <div class="admin-shell">
 
-  <!-- صندوق تسجيل الدخول -->
+  <!-- تسجيل الدخول -->
   <div class="login-box" id="loginBox">
-    <h2>دخول الإدارة</h2>
-    <p>هذه اللوحة خاصة بصاحب المتجر فقط.</p>
+    <h2>دخول الإدارة — الصيدلية</h2>
+    <p>لوحة تحكم إضافة وتعديل الأدوية.</p>
     <div class="field">
       <label>البريد الإلكتروني</label>
       <input type="email" id="adminEmail">
@@ -112,37 +130,69 @@
     </div>
     <button class="btn solid wide" id="loginBtn">دخول</button>
     <p class="error-msg" id="loginError"></p>
-    <p style="margin-top:20px;"><a href="index.html" style="color:var(--gray); font-size:13px; font-weight:700;">← رجوع للمتجر</a></p>
+    <p style="margin-top:20px;"><a href="index.html" style="color:var(--gray); font-size:13px; font-weight:700;">← رجوع للصيدلية</a></p>
   </div>
 
   <!-- لوحة التحكم -->
   <div id="dashboard">
     <div class="admin-header">
-      <h2>إدارة المنتجات</h2>
+      <h2>إدارة الأدوية والمنتجات الطبية</h2>
       <div style="display:flex; gap:10px;">
-        <a href="index.html" class="btn ghost small">عرض المتجر</a>
+        <a href="index.html" class="btn ghost small">عرض الصيدلية</a>
         <button class="btn ghost small" id="logoutBtn">خروج</button>
       </div>
     </div>
 
     <div class="admin-panel">
-      <h3 id="formTitle">إضافة قطعة جديدة</h3>
+      <h3 id="formTitle">إضافة دواء جديد</h3>
       <div class="field">
-        <label>الصور (حتى 4 صور)</label>
+        <label>صورة الدواء (حتى 4 صور)</label>
         <div class="image-slots" id="imageSlots"></div>
       </div>
-      <div class="field"><label>اسم القطعة</label><input type="text" id="pTitle"></div>
-      <div class="field"><label>الوصف</label><textarea id="pDesc"></textarea></div>
-      <div class="field"><label>السعر الحالي (د.ل)</label><input type="text" id="pPrice" inputmode="decimal"></div>
-      <div class="field"><label>السعر قبل الخصم (اختياري)</label><input type="text" id="pOriginalPrice" inputmode="decimal"></div>
-      <div class="field"><label>التصنيف</label><input type="text" id="pCategory" list="categoryList" placeholder="مثال: قمصان"><datalist id="categoryList"></datalist></div>
-      <div class="field"><label>المقاس</label><input type="text" id="pSize" placeholder="مثال: M أو 42"></div>
-      <div class="field"><label>اللون</label><input type="text" id="pColor"></div>
-      <div class="field" style="display:flex; align-items:center; gap:10px;">
-        <input type="checkbox" id="pInStock" checked style="width:auto;">
-        <label style="margin:0;" for="pInStock">متوفر بالمخزون</label>
+      <div class="field">
+        <label>الاسم التجاري (Trade Name)</label>
+        <input type="text" id="pTitle" placeholder="مثال: Augmentin">
       </div>
-      <button class="btn solid wide" id="publishBtn">نشر القطعة</button>
+      
+      <!-- الاسم العلمي بخط ولون مميز -->
+      <div class="field field-scientific">
+        <label>الاسم العلمي (Active Ingredient / Generic Name) ★</label>
+        <input type="text" id="pScientific" placeholder="مثال: Amoxicillin / Clavulanic acid">
+      </div>
+
+      <div class="field">
+        <label>التركيز (Dosage / Strength)</label>
+        <input type="text" id="pStrength" placeholder="مثال: 1000 mg أو 500 mg / 125 mg">
+      </div>
+
+      <div class="field">
+        <label>حجم / كمية العبوة (Pack Size / Volume)</label>
+        <input type="text" id="pPackSize" placeholder="مثال: 14 قرص أو 100 مل">
+      </div>
+
+      <div class="field">
+        <label>الشركة المصنعة (Manufacturer)</label>
+        <input type="text" id="pManufacturer" placeholder="مثال: GSK">
+      </div>
+
+      <div class="field">
+        <label>السعر (د.ل)</label>
+        <input type="text" id="pPrice" inputmode="decimal" placeholder="0.00">
+      </div>
+
+      <div class="field">
+        <label>وصف / دواعي الاستعمال أو ملاحظات</label>
+        <textarea id="pDesc" placeholder="ملاحظات استخدام أو شروط التخزين..."></textarea>
+      </div>
+
+      <!-- حالة التوفر المميزة -->
+      <div class="stock-checkbox-wrap">
+        <input type="checkbox" id="pInStock" checked style="width:20px; height:20px; cursor:pointer;">
+        <label for="pInStock" style="margin:0; cursor:pointer; font-weight:800; flex:1;">حالة الدواء في المخزون:</label>
+        <span id="stockStatusText" class="stock-status-badge available">متوفر</span>
+      </div>
+
+      <button class="btn solid wide" id="publishBtn">نشر الدواء</button>
       <p class="error-msg" id="publishError"></p>
       <p style="margin-top:10px; display:none;" id="cancelEditWrap">
         <a href="#" id="cancelEditBtn" style="color:var(--gray); font-size:13px; font-weight:700;">إلغاء التعديل والبدء من جديد</a>
@@ -150,7 +200,7 @@
     </div>
 
     <div class="admin-panel admin-list">
-      <h3>القطع المنشورة</h3>
+      <h3>الأدوية والمنتجات المسجلة</h3>
       <div id="adminProductsList"><p class="loading-line">جاري التحميل...</p></div>
     </div>
   </div>
@@ -185,7 +235,19 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove('show'), 2600);
 }
 
-// المصادقة والحالة
+// التبديل بين شارة متوفر وغير متوفر
+const stockCheckbox = document.getElementById('pInStock');
+const stockStatusText = document.getElementById('stockStatusText');
+stockCheckbox.addEventListener('change', (e) => {
+  if(e.target.checked) {
+    stockStatusText.textContent = "متوفر";
+    stockStatusText.className = "stock-status-badge available";
+  } else {
+    stockStatusText.textContent = "غير متوفر";
+    stockStatusText.className = "stock-status-badge unavailable";
+  }
+});
+
 auth.onAuthStateChanged(user => {
   if (user) {
     document.getElementById('loginBox').style.display = 'none';
@@ -206,14 +268,13 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   try {
     await auth.signInWithEmailAndPassword(email, pass);
   } catch (e) {
-    err.textContent = "خطأ في البريد أو كلمة المرور";
+    err.textContent = "خطأ في بيانات الدخول";
     err.style.display = 'block';
   }
 });
 
 document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
 
-// إدارة الصور
 function renderImageSlots() {
   const container = document.getElementById('imageSlots');
   container.innerHTML = '';
@@ -272,7 +333,7 @@ function watchAdminProducts() {
     
     const container = document.getElementById('adminProductsList');
     if (list.length === 0) {
-      container.innerHTML = '<p style="color:var(--gray); font-size:13px;">لا توجد قطع منشورة بعد.</p>';
+      container.innerHTML = '<p style="color:var(--gray); font-size:13px;">لا يوجد أدوية مسجلة بعد.</p>';
       return;
     }
 
@@ -280,8 +341,14 @@ function watchAdminProducts() {
       <div class="row">
         <img src="${(p.imageUrls && p.imageUrls[0]) || ''}" alt="">
         <div class="rinfo">
-          <div class="rn">${p.title || 'بدون اسم'}</div>
-          <div class="rp">${p.price} د.ل</div>
+          <div class="rn">${p.title || 'بدون اسم تجاري'} (${p.strength || ''})</div>
+          <div class="sci">الاسم العلمي: ${p.scientific || 'غير محدد'}</div>
+          <div class="rp">
+            ${p.price} د.ل — 
+            <span style="color: ${p.inStock ? 'var(--in-stock)' : 'var(--out-stock)'}; font-weight:900;">
+              ${p.inStock ? 'متوفر' : 'غير متوفر'}
+            </span>
+          </div>
         </div>
         <button class="btn ghost small" onclick="editProduct('${p.id}')">تعديل</button>
         <button class="btn danger small" onclick="deleteProduct('${p.id}')">حذف</button>
@@ -292,23 +359,23 @@ function watchAdminProducts() {
   });
 }
 
-// النشر والحفظ
 document.getElementById('publishBtn').addEventListener('click', async () => {
   const btn = document.getElementById('publishBtn');
   const err = document.getElementById('publishError');
   err.style.display = 'none';
 
   const title = document.getElementById('pTitle').value.trim();
+  const scientific = document.getElementById('pScientific').value.trim();
   const price = document.getElementById('pPrice').value.trim();
 
   if (!title || !price) {
-    err.textContent = "يرجى كتابة الاسم والسعر على الأقل.";
+    err.textContent = "يرجى كتابة الاسم التجاري والسعر على الأقل.";
     err.style.display = 'block';
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = "جاري الحفظ والرفع...";
+  btn.textContent = "جاري الحفظ...";
 
   try {
     let finalUrls = [...existingImageUrls];
@@ -322,34 +389,34 @@ document.getElementById('publishBtn').addEventListener('click', async () => {
     finalUrls = finalUrls.filter(Boolean);
 
     const payload = {
-      title,
-      description: document.getElementById('pDesc').value.trim(),
+      title, // الاسم التجاري
+      scientific, // الاسم العلمي
+      strength: document.getElementById('pStrength').value.trim(), // التركيز
+      packSize: document.getElementById('pPackSize').value.trim(), // كمية العبوة
+      manufacturer: document.getElementById('pManufacturer').value.trim(), // الشركة المصنعة
       price: Number(price),
-      originalPrice: Number(document.getElementById('pOriginalPrice').value.trim()) || 0,
-      category: document.getElementById('pCategory').value.trim(),
-      size: document.getElementById('pSize').value.trim(),
-      color: document.getElementById('pColor').value.trim(),
-      inStock: document.getElementById('pInStock').checked,
+      description: document.getElementById('pDesc').value.trim(),
+      inStock: stockCheckbox.checked,
       imageUrls: finalUrls,
       updatedAt: Date.now()
     };
 
     if (editDocId) {
       await db.collection('products').doc(editDocId).update(payload);
-      showToast("تم تحديث القطعة بنجاح");
+      showToast("تم تحديث بيانات الدواء");
     } else {
       payload.createdAt = Date.now();
       await db.collection('products').add(payload);
-      showToast("تم نشر القطعة بنجاح");
+      showToast("تم إضافة الدواء بنجاح");
     }
 
     resetForm();
   } catch (e) {
-    err.textContent = "حدث خطأ أثناء الحفظ: " + e.message;
+    err.textContent = "حدث خطأ: " + e.message;
     err.style.display = 'block';
   } finally {
     btn.disabled = false;
-    btn.textContent = editDocId ? "تحديث القطعة" : "نشر القطعة";
+    btn.textContent = editDocId ? "تحديث الدواء" : "نشر الدواء";
   }
 });
 
@@ -358,18 +425,20 @@ window.editProduct = function(id) {
   if (!p) return;
 
   editDocId = id;
-  document.getElementById('formTitle').textContent = "تعديل قطعة";
-  document.getElementById('publishBtn').textContent = "تحديث القطعة";
+  document.getElementById('formTitle').textContent = "تعديل بيانت الدواء";
+  document.getElementById('publishBtn').textContent = "تحديث الدواء";
   document.getElementById('cancelEditWrap').style.display = 'block';
 
   document.getElementById('pTitle').value = p.title || '';
-  document.getElementById('pDesc').value = p.description || '';
+  document.getElementById('pScientific').value = p.scientific || '';
+  document.getElementById('pStrength').value = p.strength || '';
+  document.getElementById('pPackSize').value = p.packSize || '';
+  document.getElementById('pManufacturer').value = p.manufacturer || '';
   document.getElementById('pPrice').value = p.price || '';
-  document.getElementById('pOriginalPrice').value = p.originalPrice || '';
-  document.getElementById('pCategory').value = p.category || '';
-  document.getElementById('pSize').value = p.size || '';
-  document.getElementById('pColor').value = p.color || '';
-  document.getElementById('pInStock').checked = p.inStock !== false;
+  document.getElementById('pDesc').value = p.description || '';
+  
+  stockCheckbox.checked = p.inStock !== false;
+  stockCheckbox.dispatchEvent(new Event('change'));
 
   existingImageUrls = p.imageUrls || [];
   selectedFiles = [null, null, null, null];
@@ -377,9 +446,9 @@ window.editProduct = function(id) {
 };
 
 window.deleteProduct = async function(id) {
-  if (confirm("هل أنت تأكد من حذف هذه القطعة؟")) {
+  if (confirm("هل أنت تأكد من حذف هذا الدواء؟")) {
     await db.collection('products').doc(id).delete();
-    showToast("تم حذف القطعة");
+    showToast("تم حذف الدواء");
   }
 };
 
@@ -387,18 +456,20 @@ function resetForm() {
   editDocId = null;
   selectedFiles = [null, null, null, null];
   existingImageUrls = [];
-  document.getElementById('formTitle').textContent = "إضافة قطعة جديدة";
-  document.getElementById('publishBtn').textContent = "نشر القطعة";
+  document.getElementById('formTitle').textContent = "إضافة دواء جديد";
+  document.getElementById('publishBtn').textContent = "نشر الدواء";
   document.getElementById('cancelEditWrap').style.display = 'none';
 
   document.getElementById('pTitle').value = '';
-  document.getElementById('pDesc').value = '';
+  document.getElementById('pScientific').value = '';
+  document.getElementById('pStrength').value = '';
+  document.getElementById('pPackSize').value = '';
+  document.getElementById('pManufacturer').value = '';
   document.getElementById('pPrice').value = '';
-  document.getElementById('pOriginalPrice').value = '';
-  document.getElementById('pCategory').value = '';
-  document.getElementById('pSize').value = '';
-  document.getElementById('pColor').value = '';
-  document.getElementById('pInStock').checked = true;
+  document.getElementById('pDesc').value = '';
+  
+  stockCheckbox.checked = true;
+  stockCheckbox.dispatchEvent(new Event('change'));
 
   renderImageSlots();
 }
