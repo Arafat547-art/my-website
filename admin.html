@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>لوحة إدارة صيدلية الحياة</title>
+<title>لوحة إدارة الصيدلية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -59,7 +59,6 @@
   .field textarea{min-height:90px; resize:vertical;}
   .error-msg{color:var(--danger); font-size:12.5px; margin-top:8px; display:none; font-weight:700;}
 
-  /* تمييز حقل الاسم العلمي (من الكود السابق) */
   .field-scientific input{
     border:2px solid var(--blue);
     background:#eef6ff;
@@ -67,7 +66,6 @@
     color:var(--blue-dark);
   }
 
-  /* شارة التوفر (من الكود السابق) */
   .stock-checkbox-wrap{
     display:flex; align-items:center; gap:12px; background:#fff; padding:12px;
     border-radius:10px; border:2px dashed var(--line-strong); margin-bottom:16px;
@@ -118,7 +116,7 @@
 <header class="topbar">
   <div class="brand">
     <div class="logo-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg></div>
-    لوحة إدارة صيدلية الحياة
+    <span id="topbarTitle">لوحة إدارة الصيدلية</span>
   </div>
   <a href="index.html" class="btn ghost small" style="color:#fff; border-color:rgba(255,255,255,.35);">عرض المتجر</a>
 </header>
@@ -136,7 +134,7 @@
 
   <div id="dashboard" style="display:none;">
     <div class="admin-header">
-      <h2>إدارة الأدوية والمنتجات</h2>
+      <h2 id="dashHeaderTitle">إدارة الأدوية والمنتجات</h2>
       <button class="btn ghost small" id="logoutBtn">خروج</button>
     </div>
 
@@ -156,7 +154,6 @@
         </div>
       </div>
 
-      <!-- الاسم العلمي (من الكود السابق) -->
       <div class="field field-scientific">
         <label>الاسم العلمي (Active Ingredient) ★</label>
         <input type="text" id="pScientific" placeholder="مثال: Paracetamol">
@@ -176,7 +173,6 @@
 
       <div class="field"><label>العبوة / الكمية</label><input type="text" id="pPack" placeholder="مثال: 20 قرص، 100 مل، 14 كبسولة"></div>
 
-      <!-- شارة التوفر (من الكود السابق) -->
       <div class="stock-checkbox-wrap">
         <input type="checkbox" id="pInStock" checked style="width:20px; height:20px; cursor:pointer;">
         <label for="pInStock" style="margin:0; cursor:pointer; font-weight:800; flex:1;">حالة المنتج بالمخزون:</label>
@@ -201,7 +197,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ======== نفس بيانات القاعدة (Firebase) من الكود السابق ======== */
 const firebaseConfig = {
   apiKey: "AIzaSyBzLZxIGum-QQ4vEvGsaozAqDQDyUiW54k",
   authDomain: "as12-d6210.firebaseapp.com",
@@ -212,8 +207,9 @@ const firebaseConfig = {
 };
 const IMGBB_KEY = "d8ce52076bc29d3fd2691875d307c021";
 
-/* مهم: نفس اسم الـ collection اللي تقرأ منه واجهة المتجر (index.html) حتى تظهر المنتجات فعليًا بالمتجر */
+/* نفس اسم الـ collection اللي تقرأ منه واجهة المتجر */
 const COLLECTION_NAME = "pharmacyProducts";
+const PHARMACIES_COLLECTION = "pharmacies";
 
 const CATEGORY_NAMES = [
   "الأدوية العامة",
@@ -229,6 +225,9 @@ const CATEGORY_NAMES = [
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+/* بيانات الصيدلية صاحبة الحساب المسجّل دخوله حالياً */
+let currentPharmacy = null;
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -293,28 +292,52 @@ document.getElementById('loginBtn').addEventListener('click', async ()=>{
 document.getElementById('logoutBtn').addEventListener('click', async ()=>{
   await auth.signOut();
 });
-auth.onAuthStateChanged(user=>{
+
+auth.onAuthStateChanged(async user=>{
   if(user){
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
+
+    /* نجيب بيانات الصيدلية صاحبة هذا الحساب */
+    try{
+      const doc = await db.collection(PHARMACIES_COLLECTION).doc(user.uid).get();
+      if(doc.exists){
+        currentPharmacy = { id: doc.id, ...doc.data() };
+        document.getElementById('topbarTitle').textContent = 'لوحة إدارة ' + (currentPharmacy.name || '');
+        document.getElementById('dashHeaderTitle').textContent = 'إدارة منتجات ' + (currentPharmacy.name || '');
+      } else {
+        currentPharmacy = null;
+        showToast('تنبيه: لا يوجد ملف صيدلية مرتبط بهذا الحساب، تواصل مع الدعم الفني');
+      }
+    }catch(err){
+      currentPharmacy = null;
+    }
+
     watchProducts();
   } else {
     document.getElementById('loginBox').style.display = 'block';
     document.getElementById('dashboard').style.display = 'none';
+    currentPharmacy = null;
   }
 });
 
 /* products state */
 let allProducts = [];
 function watchProducts(){
-  db.collection(COLLECTION_NAME).orderBy('createdAt','desc').onSnapshot(snap=>{
-    allProducts = [];
-    snap.forEach(doc=> allProducts.push({ id: doc.id, ...doc.data() }));
-    renderAdminList();
-  }, err=>{
-    document.getElementById('adminProductsList').innerHTML =
-      '<p style="color:var(--danger); font-size:13px;">تعذّر تحميل المنتجات، تأكد من صلاحيات Firestore لقائمة ' + COLLECTION_NAME + '</p>';
-  });
+  const uid = auth.currentUser ? auth.currentUser.uid : null;
+  if(!uid) return;
+  /* كل صيدلية تشوف فقط منتجاتها هي (pharmacyId == uid حسابها) */
+  db.collection(COLLECTION_NAME)
+    .where('pharmacyId', '==', uid)
+    .orderBy('createdAt','desc')
+    .onSnapshot(snap=>{
+      allProducts = [];
+      snap.forEach(doc=> allProducts.push({ id: doc.id, ...doc.data() }));
+      renderAdminList();
+    }, err=>{
+      document.getElementById('adminProductsList').innerHTML =
+        '<p style="color:var(--danger); font-size:13px;">تعذّر تحميل المنتجات. إذا ظهرت رسالة "index" في الـ console، افتح الرابط اللي فيها لإنشاء الفهرس المطلوب في Firestore (يصير مرة واحدة فقط).</p>';
+    });
 }
 
 /* image slots */
@@ -385,6 +408,9 @@ function startEdit(id){
 document.getElementById('cancelEditBtn').addEventListener('click', e=>{ e.preventDefault(); resetForm(); });
 
 document.getElementById('publishBtn').addEventListener('click', async ()=>{
+  const uid = auth.currentUser ? auth.currentUser.uid : null;
+  if(!uid) return;
+
   const title = document.getElementById('pTitle').value.trim();
   const scientific = document.getElementById('pScientific').value.trim();
   const strength = document.getElementById('pStrength').value.trim();
@@ -430,7 +456,8 @@ document.getElementById('publishBtn').addEventListener('click', async ()=>{
     }
     const data = {
       title, scientific, strength, manufacturer, description,
-      price, originalPrice, category, pack, imageUrls, inStock
+      price, originalPrice, category, pack, imageUrls, inStock,
+      pharmacyId: uid /* ربط المنتج بصاحبه */
     };
     if(editingProductId){
       await db.collection(COLLECTION_NAME).doc(editingProductId).update(data);
