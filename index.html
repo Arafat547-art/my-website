@@ -980,8 +980,8 @@ document.querySelectorAll('[data-nav="categories"]').forEach(el=> el.addEventLis
   else{ document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth', block:'start'}); }
 }));
 document.querySelectorAll('[data-nav="account"]').forEach(el=> el.addEventListener('click', e=>{
-  e.preventDefault(); closeSheet(moreSheet, moreBackdrop);
-  showToast('تسجيل دخول العملاء قريبًا');
+  e.preventDefault();
+  window.location.href = 'admin.html';
 }));
 
 updateCartBadge();
