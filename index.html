@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>صيدلية الحياة — صحتك تهمنا</title>
+<title>سوق الصيدليات — صحتك تهمنا</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -26,6 +26,7 @@
     --page-bg:#eef2f8;
     --white:#fff;
     --danger:#e6483a;
+    --wa:#25d366;
     --shell-w:1280px;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -137,6 +138,14 @@
   .cat-item svg{width:18px; height:18px; color:var(--blue); flex:0 0 auto;}
   .cat-item.active{background:var(--blue-light); color:var(--blue-dark);}
 
+  /* شارة اسم الصيدلية داخل بطاقة المنتج */
+  .sidebar-ph h3{margin-top:18px;}
+  .ph-filter-item{
+    display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:10px; font-size:12.5px; font-weight:700;
+    color:var(--ink); margin-bottom:3px;
+  }
+  .ph-filter-item.active{background:var(--blue-light); color:var(--blue-dark);}
+
   .toolbar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:4px;}
   .toolbar h2{font-size:16.5px; font-weight:800;}
   .sort-select{
@@ -163,19 +172,30 @@
     left:8px; right:8px; top:50%; transform:translateY(-50%); text-align:center;
     background:rgba(18,32,64,0.82); color:#fff; padding:6px 6px; font-size:10.5px; border-radius:6px;
   }
-  .card .info{padding:10px 11px 12px; cursor:pointer;}
+  .card .info{padding:10px 11px 0; cursor:pointer;}
+  .pharmacy-tag{
+    display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:var(--blue-dark);
+    background:var(--blue-light); padding:3px 8px; border-radius:999px; margin-bottom:6px; max-width:100%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
   .card .info .name{font-size:12.5px; font-weight:800; margin-bottom:4px; line-height:1.35; min-height:34px;}
   .card .info .pack{font-size:10.5px; color:var(--gray); margin-bottom:6px;}
   .card .info .price-row{display:flex; align-items:baseline; gap:6px; margin-bottom:10px;}
   .card .info .price{color:var(--blue-dark); font-size:14.5px; font-weight:900;}
   .card .info .price-old{color:var(--gray); font-size:10.5px; text-decoration:line-through;}
+  .card-actions{display:flex; gap:6px; padding:0 11px 12px;}
   .add-btn{
-    display:flex; align-items:center; justify-content:center; gap:6px; width:100%;
+    display:flex; align-items:center; justify-content:center; gap:6px; flex:1;
     background:var(--blue); color:#fff; padding:9px 8px; border-radius:8px; font-size:11.5px; font-weight:800;
   }
   .add-btn:hover{background:var(--blue-dark);}
   .add-btn svg{width:14px; height:14px;}
   .add-btn:disabled{background:var(--gray-light); color:var(--gray); cursor:not-allowed;}
+  .wa-quick-btn{
+    display:flex; align-items:center; justify-content:center; width:36px; flex:0 0 auto;
+    background:var(--wa); color:#fff; border-radius:8px;
+  }
+  .wa-quick-btn svg{width:16px; height:16px;}
 
   .empty-state{padding:60px 20px; text-align:center; color:var(--gray); grid-column:1/-1;}
   .empty-state .display{font-size:18px; font-weight:900; color:var(--ink); margin-bottom:6px;}
@@ -233,6 +253,7 @@
   .cart-item img{width:52px; height:52px; object-fit:contain; background:var(--gray-light); border-radius:8px; padding:4px;}
   .cart-item .ci-info{flex:1; min-width:0;}
   .cart-item .ci-name{font-size:13px; font-weight:700; margin-bottom:3px;}
+  .cart-item .ci-ph{font-size:10.5px; color:var(--blue-dark); font-weight:700; margin-bottom:3px;}
   .cart-item .ci-price{font-size:12.5px; color:var(--blue-dark); font-weight:800;}
   .qty-stepper{display:flex; align-items:center; gap:8px; background:var(--gray-light); border-radius:8px; padding:4px 8px;}
   .qty-stepper button{width:20px; height:20px; font-weight:900; font-size:14px; color:var(--blue-dark);}
@@ -241,6 +262,7 @@
   .cart-empty{text-align:center; padding:40px 10px; color:var(--gray);}
   .cart-summary{padding-top:14px; margin-top:6px;}
   .cart-summary .row{display:flex; justify-content:space-between; font-size:14px; font-weight:800; margin-bottom:14px;}
+  .cart-note{font-size:11.5px; color:var(--gray); margin-bottom:12px; line-height:1.6;}
 
   /* ============ Product detail ============ */
   .detail-full{
@@ -316,7 +338,7 @@
       <div class="logo-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg>
       </div>
-      <div class="brand-text"><span class="bn">صيدلية الحياة</span><span class="bt">صحتك تهمنا</span></div>
+      <div class="brand-text"><span class="bn">سوق الصيدليات</span><span class="bt">كل الصيدليات في مكان واحد</span></div>
     </div>
 
     <nav class="main-nav" id="mainNav">
@@ -338,7 +360,7 @@
   <section class="hero">
     <div class="hero-img"><img src="https://images.unsplash.com/photo-1585435557343-3b092031a831?q=80&w=1200&auto=format&fit=crop" alt=""></div>
     <div class="hero-text">
-      <h1>أدوية أصلية<span class="sub">لصحة أفضل لحياة أفضل</span></h1>
+      <h1>أدوية أصلية<span class="sub">من عدة صيدليات موثوقة، بمكان واحد</span></h1>
       <button class="btn accent" id="heroShopBtn">
         تسوق الآن
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
@@ -365,7 +387,7 @@
     </div>
     <div class="feature">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="2.5" width="8" height="19" rx="4" transform="rotate(45 8.5 12)"/><line x1="6.5" y1="14" x2="14" y2="21.5"/></svg>
-      <span>أدوية أصلية<br>من أفضل الماركات العالمية</span>
+      <span>أدوية أصلية<br>من صيدليات موثوقة</span>
     </div>
   </div>
 
@@ -376,6 +398,14 @@
         جميع الأقسام
       </h3>
       <div id="catListDesktop"></div>
+
+      <div class="sidebar-ph">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg>
+          الصيدليات
+        </h3>
+        <div id="phListDesktop"></div>
+      </div>
     </aside>
 
     <main class="main-col">
@@ -385,7 +415,7 @@
           <option value="price-asc">السعر: من الأقل</option>
           <option value="price-desc">السعر: من الأعلى</option>
         </select>
-        <h2 id="sectionTitle">الأدوية الأكثر مبيعاً 🔥</h2>
+        <h2 id="sectionTitle">جميع المنتجات 🔥</h2>
       </div>
 
       <div id="productsGrid" class="grid">
@@ -454,10 +484,6 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="11" x2="12" y2="16"/></svg>
     من نحن
   </a>
-  <a href="#" class="sheet-link" id="waMoreLink">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    تواصل معنا عبر واتساب
-  </a>
 </div>
 
 <!-- Category sheet (mobile) -->
@@ -466,6 +492,8 @@
   <div class="sheet-handle"></div>
   <h3>جميع الأقسام</h3>
   <div id="catListMobile"></div>
+  <h3 style="margin-top:18px;">الصيدليات</h3>
+  <div id="phListMobile"></div>
 </div>
 
 <!-- Cart sheet -->
@@ -476,6 +504,7 @@
   <div id="cartItemsWrap"></div>
   <div class="cart-summary" id="cartSummary" style="display:none;">
     <div class="row"><span>الإجمالي</span><span id="cartTotal">0.00 د.ل</span></div>
+    <p class="cart-note">إذا كانت السلة فيها منتجات من أكثر من صيدلية، رح يفتح لك متصفحك رسالة واتساب منفصلة لكل صيدلية.</p>
     <button class="btn accent wide" id="checkoutBtn">إتمام الطلب عبر واتساب</button>
   </div>
 </div>
@@ -488,6 +517,7 @@
   <div class="main-img"><img id="detailMainImg" src="" alt=""></div>
   <div class="thumbs" id="detailThumbs"></div>
   <div class="content">
+    <div class="pharmacy-tag" id="detailPharmacyTag" style="margin-bottom:8px;"></div>
     <h2 id="detailTitle"></h2>
     <div class="pack" id="detailPack"></div>
     <div class="price-row" id="detailPriceRow"></div>
@@ -507,8 +537,13 @@ const firebaseConfig = {
   messagingSenderId: "490183773270",
   appId: "1:490183773270:web:d8a8ff4be981d20f0afff7"
 };
-const WHATSAPP_NUMBER = "218915355699";
-const COLLECTION_NAME = "products";
+
+/* رقم عام للدعم الفني للموقع نفسه (مو صيدلية معينة) - غيّره لو تبي */
+const SUPPORT_WHATSAPP_NUMBER = "218915355699";
+
+/* نفس اسم الـ collection اللي تكتب فيه لوحة التحكم */
+const COLLECTION_NAME = "pharmacyProducts";
+const PHARMACIES_COLLECTION = "pharmacies";
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -523,6 +558,8 @@ const CATEGORIES = [
   { name:"المستلزمات الطبية", icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="9.5" y1="13.5" x2="14.5" y2="13.5"/></svg>' },
   { name:"العناية الشخصية", icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 14.5l-4.8 2.4.9-5.4-3.9-3.8 5.4-.8z"/></svg>' }
 ];
+
+const WA_ICON_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.14c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.96-.31-1.65-.6-2.9-1.25-4.8-4.17-4.94-4.36-.14-.19-1.18-1.57-1.18-3 0-1.43.75-2.13 1.02-2.42.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2.01.89 2.15.07.14.12.31.02.5-.1.19-.15.31-.29.48-.14.17-.3.37-.43.5-.14.14-.29.29-.13.57.17.29.75 1.24 1.6 2 .11.99 2.02 1.63 2.3 1.77.29.14.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.63-.14.26.1 1.65.78 1.93.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>';
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -542,20 +579,39 @@ function discountPercent(p){
   const orig = Number(p.originalPrice), cur = Number(p.price);
   return Math.round((1 - cur/orig) * 100);
 }
+function getPharmacy(id){
+  return pharmaciesMap[id] || { name:'صيدلية', whatsapp: SUPPORT_WHATSAPP_NUMBER };
+}
+function waLink(number, text){
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}
 
 /* ============ Store state ============ */
 let allProducts = [];
+let pharmaciesMap = {};   // { uid: {name, whatsapp, logoUrl} }
+let activePharmacyId = "";
 let activeCategory = "";
 let searchQuery = "";
 let sortMode = "best";
 let currentPage = 1;
 const PAGE_SIZE = 8;
 
+async function loadPharmacies(){
+  try{
+    const snap = await db.collection(PHARMACIES_COLLECTION).get();
+    pharmaciesMap = {};
+    snap.forEach(doc=> pharmaciesMap[doc.id] = doc.data());
+  }catch(err){
+    pharmaciesMap = {};
+  }
+}
+
 function watchProducts(){
   db.collection(COLLECTION_NAME).orderBy('createdAt','desc').onSnapshot(snap=>{
     allProducts = [];
     snap.forEach(doc=> allProducts.push({ id: doc.id, ...doc.data() }));
     buildCategoryLists();
+    buildPharmacyLists();
     currentPage = 1;
     renderGrid();
   }, err=>{
@@ -590,9 +646,36 @@ function buildCategoryLists(){
   });
 }
 
+function buildPharmacyLists(){
+  const usedIds = [...new Set(allProducts.map(p=>p.pharmacyId).filter(Boolean))];
+  const html = (extraClass)=>{
+    let out = `<div class="ph-filter-item ${activePharmacyId===""?"active":""} ${extraClass}" data-ph="">كل الصيدليات</div>`;
+    out += usedIds.map(id=>{
+      const ph = getPharmacy(id);
+      return `<div class="ph-filter-item ${activePharmacyId===id?"active":""} ${extraClass}" data-ph="${id}">${ph.name||'صيدلية'}</div>`;
+    }).join('');
+    return out;
+  };
+  const desktop = document.getElementById('phListDesktop');
+  const mobile = document.getElementById('phListMobile');
+  if(desktop) desktop.innerHTML = html('d');
+  if(mobile) mobile.innerHTML = html('m');
+  document.querySelectorAll('.ph-filter-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      activePharmacyId = el.dataset.ph;
+      currentPage = 1;
+      buildPharmacyLists();
+      renderGrid();
+      closeSheet(catSheet, catBackdrop);
+      setActiveNav('home');
+    });
+  });
+}
+
 function getFilteredSortedProducts(){
   let list = allProducts;
   if(activeCategory) list = list.filter(p=>p.category === activeCategory);
+  if(activePharmacyId) list = list.filter(p=>p.pharmacyId === activePharmacyId);
   if(searchQuery) list = list.filter(p=>
     (p.title||'').toLowerCase().includes(searchQuery) ||
     (p.description||'').toLowerCase().includes(searchQuery)
@@ -608,10 +691,10 @@ function renderGrid(){
   const full = getFilteredSortedProducts();
 
   document.getElementById('sectionTitle').textContent =
-    activeCategory ? activeCategory : 'الأدوية الأكثر مبيعاً 🔥';
+    activeCategory ? activeCategory : 'جميع المنتجات 🔥';
 
   if(full.length === 0){
-    grid.innerHTML = '<div class="empty-state"><div class="display">لا توجد أدوية مطابقة</div><p>جرّب تغيير القسم أو كلمة البحث</p></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="display">لا توجد أدوية مطابقة</div><p>جرّب تغيير القسم أو الصيدلية أو كلمة البحث</p></div>';
     document.getElementById('pagination').innerHTML = '';
     return;
   }
@@ -624,6 +707,8 @@ function renderGrid(){
   grid.innerHTML = list.map(p=>{
     const img = (p.imageUrls && p.imageUrls[0]) || '';
     const outOfStock = p.inStock === false;
+    const ph = getPharmacy(p.pharmacyId);
+    const waText = `مرحبًا ${ph.name||''}، أستفسر عن: ${p.title||''} (${fmtPrice(p.price)})`;
     return `
       <div class="card ${outOfStock?'out-of-stock':''}" data-id="${p.id}">
         <div class="thumb" data-open="${p.id}">
@@ -635,6 +720,7 @@ function renderGrid(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/></svg>
         </button>
         <div class="info" data-open="${p.id}">
+          <div class="pharmacy-tag">🏥 ${ph.name||'صيدلية'}</div>
           <div class="name">${p.title || 'بدون اسم'}</div>
           <div class="pack">${p.pack || ''}</div>
           <div class="price-row">
@@ -642,11 +728,12 @@ function renderGrid(){
             ${hasDiscount(p) ? `<span class="price-old">${fmtPrice(p.originalPrice)}</span>` : ''}
           </div>
         </div>
-        <div style="padding:0 11px 12px;">
+        <div class="card-actions">
           <button class="add-btn" data-add="${p.id}" ${outOfStock?'disabled':''}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6"/></svg>
-            ${outOfStock ? 'غير متوفر' : 'أضف إلى السلة'}
+            ${outOfStock ? 'غير متوفر' : 'أضف للسلة'}
           </button>
+          <a class="wa-quick-btn" href="${waLink(ph.whatsapp||SUPPORT_WHATSAPP_NUMBER, waText)}" target="_blank" rel="noopener" title="واتساب ${ph.name||''}" onclick="event.stopPropagation()">${WA_ICON_SVG}</a>
         </div>
       </div>`;
   }).join('');
@@ -705,7 +792,9 @@ function openDetail(id){
   if(!p) return;
   const imgs = (p.imageUrls && p.imageUrls.length) ? p.imageUrls : [''];
   const outOfStock = p.inStock === false;
+  const ph = getPharmacy(p.pharmacyId);
 
+  document.getElementById('detailPharmacyTag').innerHTML = `🏥 ${ph.name||'صيدلية'}`;
   document.getElementById('detailTitle').textContent = p.title || '';
   document.getElementById('detailPack').textContent = p.pack || '';
   document.getElementById('detailPriceRow').innerHTML =
@@ -724,11 +813,14 @@ function openDetail(id){
     });
   });
 
+  const waText = `مرحبًا ${ph.name||''}، أستفسر عن: ${p.title||''} (${fmtPrice(p.price)})`;
   const actionArea = document.getElementById('detailActionArea');
   if(outOfStock){
     actionArea.innerHTML = `<div class="oos-notice" style="flex:1;">هذا المنتج نفد من المخزون حاليًا</div>`;
   } else {
-    actionArea.innerHTML = `<button class="btn accent wide" id="detailAddBtn">أضف إلى السلة</button>`;
+    actionArea.innerHTML = `
+      <button class="btn accent wide" id="detailAddBtn">أضف إلى السلة</button>
+      <a class="wa-quick-btn" style="height:44px;" href="${waLink(ph.whatsapp||SUPPORT_WHATSAPP_NUMBER, waText)}" target="_blank" rel="noopener">${WA_ICON_SVG}</a>`;
     document.getElementById('detailAddBtn').addEventListener('click', ()=>{ addToCart(id); });
   }
   document.getElementById('detailOverlay').classList.add('open');
@@ -784,6 +876,7 @@ function renderCart(){
   wrap.innerHTML = ids.map(id=>{
     const p = allProducts.find(x=>x.id===id);
     if(!p) return '';
+    const ph = getPharmacy(p.pharmacyId);
     const lineTotal = Number(p.price) * cart[id].qty;
     total += lineTotal;
     const img = (p.imageUrls && p.imageUrls[0]) || '';
@@ -791,6 +884,7 @@ function renderCart(){
       <div class="cart-item">
         <img src="${img}" alt="">
         <div class="ci-info">
+          <div class="ci-ph">🏥 ${ph.name||'صيدلية'}</div>
           <div class="ci-name">${p.title}</div>
           <div class="ci-price">${fmtPrice(p.price)}</div>
           <button class="cart-remove" data-remove="${id}">إزالة</button>
@@ -812,21 +906,40 @@ function renderCart(){
     btn.addEventListener('click', ()=>{ delete cart[btn.dataset.remove]; saveCart(); updateCartBadge(); renderCart(); });
   });
 }
+
+/* عند إتمام الطلب: نقسم منتجات السلة حسب كل صيدلية ونفتح رسالة واتساب منفصلة لكل واحدة */
 document.getElementById('checkoutBtn').addEventListener('click', ()=>{
   const ids = Object.keys(cart);
   if(ids.length === 0) return;
-  let lines = ['مرحبًا، أريد طلب التالي:'];
-  let total = 0;
+
+  const groups = {}; // pharmacyId -> [products]
   ids.forEach(id=>{
     const p = allProducts.find(x=>x.id===id);
     if(!p) return;
-    const lineTotal = Number(p.price) * cart[id].qty;
-    total += lineTotal;
-    lines.push(`- ${p.title} × ${cart[id].qty} = ${fmtPrice(lineTotal.toFixed(2))}`);
+    const phId = p.pharmacyId || 'unknown';
+    if(!groups[phId]) groups[phId] = [];
+    groups[phId].push(p);
   });
-  lines.push(`الإجمالي: ${fmtPrice(total.toFixed(2))}`);
-  const msg = encodeURIComponent(lines.join('\n'));
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+
+  const phIds = Object.keys(groups);
+  phIds.forEach((phId, idx)=>{
+    const ph = getPharmacy(phId);
+    let lines = [`مرحبًا ${ph.name||''}، أريد طلب التالي:`];
+    let total = 0;
+    groups[phId].forEach(p=>{
+      const lineTotal = Number(p.price) * cart[p.id].qty;
+      total += lineTotal;
+      lines.push(`- ${p.title} × ${cart[p.id].qty} = ${fmtPrice(lineTotal.toFixed(2))}`);
+    });
+    lines.push(`الإجمالي: ${fmtPrice(total.toFixed(2))}`);
+    const url = waLink(ph.whatsapp || SUPPORT_WHATSAPP_NUMBER, lines.join('\n'));
+    /* فتح كل صيدلية بنافذة منفصلة، بفارق بسيط عشان المتصفح ما يمنع النوافذ */
+    setTimeout(()=> window.open(url, '_blank'), idx * 400);
+  });
+
+  if(phIds.length > 1){
+    showToast('تم فتح رسالة واتساب منفصلة لكل صيدلية، تأكد من السماح بالنوافذ المنبثقة');
+  }
 });
 
 /* ============ Sheets & nav ============ */
@@ -870,13 +983,9 @@ document.querySelectorAll('[data-nav="account"]').forEach(el=> el.addEventListen
   e.preventDefault(); closeSheet(moreSheet, moreBackdrop);
   showToast('تسجيل دخول العملاء قريبًا');
 }));
-document.getElementById('waMoreLink').addEventListener('click', e=>{
-  e.preventDefault();
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحبًا، عندي استفسار')}`, '_blank');
-});
 
 updateCartBadge();
-watchProducts();
+loadPharmacies().then(watchProducts);
 </script>
 </body>
 </html>
