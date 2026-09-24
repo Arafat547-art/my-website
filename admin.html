@@ -336,7 +336,7 @@ function watchProducts(){
       renderAdminList();
     }, err=>{
       document.getElementById('adminProductsList').innerHTML =
-        '<p style="color:var(--danger); font-size:13px;">تعذّر تحميل المنتجات. إذا ظهرت رسالة "index" في الـ console، افتح الرابط اللي فيها لإنشاء الفهرس المطلوب في Firestore (يصير مرة واحدة فقط).</p>';
+        '<p style="color:var(--danger); font-size:13px; direction:ltr; text-align:right; word-break:break-word;">تعذّر تحميل المنتجات.<br><b>رسالة الخطأ الحقيقية:</b><br>' + err.message + '<br><br><b>الكود:</b> ' + err.code + '</p>';
     });
 }
 
