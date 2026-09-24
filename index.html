@@ -267,9 +267,10 @@
   /* ============ Product detail ============ */
   .detail-full{
     position:fixed; inset:0; max-width:var(--shell-w); margin:0 auto; background:#fff; z-index:60;
-    transform:translateY(100%); transition:transform .3s cubic-bezier(.2,.8,.2,1); overflow-y:auto;
+    transform:translateY(100%); transition:transform .3s cubic-bezier(.2,.8,.2,1); overflow:hidden;
   }
   .detail-full.open{transform:translateY(0);}
+  .detail-scroll{height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;}
   .detail-full .close-x{
     position:absolute; top:16px; left:16px; z-index:5; width:36px; height:36px; border-radius:50%;
     background:rgba(18,32,64,.55); display:flex; align-items:center; justify-content:center; color:#fff;
@@ -522,15 +523,17 @@
   <button class="close-x" id="closeDetail">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
-  <div class="main-img"><img id="detailMainImg" src="" alt=""></div>
-  <div class="thumbs" id="detailThumbs"></div>
-  <div class="content">
-    <div class="pharmacy-tag" id="detailPharmacyTag" style="margin-bottom:8px;"></div>
-    <h2 id="detailTitle"></h2>
-    <div class="pack" id="detailPack"></div>
-    <div class="price-row" id="detailPriceRow"></div>
-    <div class="desc-label" id="detailDescLabel" style="display:none;">📋 نبذة عن المنتج</div>
-    <p class="desc" id="detailDesc"></p>
+  <div class="detail-scroll">
+    <div class="main-img"><img id="detailMainImg" src="" alt=""></div>
+    <div class="thumbs" id="detailThumbs"></div>
+    <div class="content">
+      <div class="pharmacy-tag" id="detailPharmacyTag" style="margin-bottom:8px;"></div>
+      <h2 id="detailTitle"></h2>
+      <div class="pack" id="detailPack"></div>
+      <div class="price-row" id="detailPriceRow"></div>
+      <div class="desc-label" id="detailDescLabel" style="display:none;">📋 نبذة عن المنتج</div>
+      <p class="desc" id="detailDesc"></p>
+    </div>
   </div>
   <div class="cta-fixed" id="detailActionArea"></div>
 </div>
