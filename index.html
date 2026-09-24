@@ -10,6 +10,8 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 
 <style>
   :root{
@@ -382,7 +384,16 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="searchInput" placeholder="ابحث عن دواء أو اسم العلامة التجارية ...">
     </div>
+    <button class="btn ghost" id="imageSearchBtn" title="بحث بصورة" style="padding:0 16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M4 16v2a2 2 0 0 0 2 2h2M20 8V6a2 2 0 0 0-2-2h-2M20 16v2a2 2 0 0 1-2 2h-2"/><circle cx="12" cy="12" r="3.5"/></svg>
+    </button>
+    <input type="file" id="imageSearchInput" accept="image/*" style="display:none;">
     <button class="btn solid-navy" id="searchBtnTop">بحث</button>
+  </div>
+
+  <div id="imageSearchBar" style="display:none; align-items:center; justify-content:space-between; gap:10px; margin:10px 16px 0; background:var(--blue-light); padding:10px 14px; border-radius:10px;">
+    <span style="font-size:12.5px; font-weight:800; color:var(--blue-dark);">🔎 نتائج البحث بالصورة (تقريبية)</span>
+    <button id="clearImageSearchBtn" style="font-size:12px; font-weight:800; color:var(--danger);">إلغاء ✕</button>
   </div>
 
   <div class="features-row">
@@ -560,6 +571,71 @@ const PHARMACIES_COLLECTION = "pharmacies";
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+/* ============ بحث بصورة (تشابه بصري باستخدام MobileNet) ============ */
+let modelPromise = null;
+function ensureModel(){
+  if(!modelPromise) modelPromise = mobilenet.load();
+  return modelPromise;
+}
+function loadImageEl(src){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+function cosineSimilarity(a, b){
+  let dot=0, na=0, nb=0;
+  const len = Math.min(a.length, b.length);
+  for(let i=0;i<len;i++){ dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+  return dot / (Math.sqrt(na)*Math.sqrt(nb) + 1e-8);
+}
+let imageSearchResultIds = null; /* null = وضع تصفح عادي، وإلا مصفوفة IDs مرتبة بالتشابه */
+
+async function handleImageSearchFile(file){
+  if(!file) return;
+  showToast('جاري تحليل الصورة...');
+  try{
+    const model = await ensureModel();
+    const blobUrl = URL.createObjectURL(file);
+    const img = await loadImageEl(blobUrl);
+    const t = model.infer(img, true);
+    const queryEmb = Array.from(t.dataSync());
+    t.dispose();
+    URL.revokeObjectURL(blobUrl);
+
+    const scored = allProducts
+      .filter(p => Array.isArray(p.imgEmbedding) && p.imgEmbedding.length)
+      .map(p => ({ p, score: cosineSimilarity(queryEmb, p.imgEmbedding) }))
+      .sort((a,b)=> b.score - a.score);
+
+    if(scored.length === 0){
+      showToast('ما فيه منتجات جاهزة للمطابقة البصرية حالياً');
+      return;
+    }
+    imageSearchResultIds = scored.slice(0, 24).map(s=>s.p.id);
+    document.getElementById('imageSearchBar').style.display = 'flex';
+    currentPage = 1;
+    renderGrid();
+    document.querySelector('.main-col')?.scrollIntoView({behavior:'smooth', block:'start'});
+  }catch(err){
+    showToast('تعذّر تحليل الصورة، حاول بصورة أخرى');
+  }
+}
+document.getElementById('imageSearchBtn').addEventListener('click', ()=>{
+  document.getElementById('imageSearchInput').click();
+});
+document.getElementById('imageSearchInput').addEventListener('change', e=>{
+  handleImageSearchFile(e.target.files[0]);
+});
+document.getElementById('clearImageSearchBtn').addEventListener('click', ()=>{
+  imageSearchResultIds = null;
+  document.getElementById('imageSearchBar').style.display = 'none';
+  currentPage = 1;
+  renderGrid();
+});
+
 const CATEGORIES = [
   { name:"الأدوية العامة", icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="2.5" width="8" height="19" rx="4" transform="rotate(45 8.5 12)"/><line x1="6.5" y1="14" x2="14" y2="21.5"/></svg>' },
   { name:"الأدوية الأمراض المزمنة", icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/></svg>' },
@@ -685,6 +761,9 @@ function buildPharmacyLists(){
 }
 
 function getFilteredSortedProducts(){
+  if(imageSearchResultIds){
+    return imageSearchResultIds.map(id => allProducts.find(p=>p.id===id)).filter(Boolean);
+  }
   let list = allProducts;
   if(activeCategory) list = list.filter(p=>p.category === activeCategory);
   if(activePharmacyId) list = list.filter(p=>p.pharmacyId === activePharmacyId);
@@ -703,7 +782,7 @@ function renderGrid(){
   const full = getFilteredSortedProducts();
 
   document.getElementById('sectionTitle').textContent =
-    activeCategory ? activeCategory : 'جميع المنتجات 🔥';
+    imageSearchResultIds ? 'نتائج مشابهة للصورة 🖼️' : (activeCategory ? activeCategory : 'جميع المنتجات 🔥');
 
   if(full.length === 0){
     grid.innerHTML = '<div class="empty-state"><div class="display">لا توجد أدوية مطابقة</div><p>جرّب تغيير القسم أو الصيدلية أو كلمة البحث</p></div>';
