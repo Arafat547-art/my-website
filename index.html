@@ -281,10 +281,18 @@
   .detail-full .thumbs img.active{opacity:1; border-color:var(--blue);}
   .detail-full .content{padding:8px 20px 120px;}
   .detail-full .content h2{font-size:20px; font-weight:900; margin-bottom:6px;}
-  .detail-full .pack{color:var(--gray); font-size:12.5px; font-weight:700; margin-bottom:12px;}
-  .detail-full .price-row{display:flex; align-items:baseline; gap:10px; margin-bottom:16px;}
-  .detail-full .price{color:var(--blue-dark); font-size:19px; font-weight:900;}
+  .detail-full .pack{
+    display:inline-flex; align-items:center; gap:5px; color:var(--blue-dark); font-size:12px; font-weight:800;
+    background:var(--blue-light); padding:5px 10px; border-radius:999px; margin-bottom:14px;
+  }
+  .detail-full .pack:empty{display:none;}
+  .detail-full .price-row{
+    display:flex; align-items:baseline; gap:10px; margin-bottom:16px; background:var(--gray-light);
+    padding:12px 14px; border-radius:12px; width:fit-content;
+  }
+  .detail-full .price{color:var(--blue-dark); font-size:21px; font-weight:900;}
   .detail-full .price-old{color:var(--gray); font-size:13px; text-decoration:line-through;}
+  .detail-full .desc-label{font-size:12px; font-weight:800; color:var(--ink); margin-bottom:6px;}
   .detail-full .desc{color:var(--gray); line-height:1.9; font-size:13.5px; margin-bottom:16px;}
   .oos-notice{border:1px solid var(--line-strong); color:var(--gray); padding:14px; text-align:center; font-size:13px; border-radius:10px; font-weight:700;}
   .detail-full .cta-fixed{
@@ -521,6 +529,7 @@
     <h2 id="detailTitle"></h2>
     <div class="pack" id="detailPack"></div>
     <div class="price-row" id="detailPriceRow"></div>
+    <div class="desc-label" id="detailDescLabel" style="display:none;">📋 نبذة عن المنتج</div>
     <p class="desc" id="detailDesc"></p>
   </div>
   <div class="cta-fixed" id="detailActionArea"></div>
@@ -796,11 +805,12 @@ function openDetail(id){
 
   document.getElementById('detailPharmacyTag').innerHTML = `🏥 ${ph.name||'صيدلية'}`;
   document.getElementById('detailTitle').textContent = p.title || '';
-  document.getElementById('detailPack').textContent = p.pack || '';
+  document.getElementById('detailPack').textContent = p.pack ? ('📦 العبوة: ' + p.pack) : '';
   document.getElementById('detailPriceRow').innerHTML =
     `<span class="price">${fmtPrice(p.price)}</span>` +
     (hasDiscount(p) ? `<span class="price-old">${fmtPrice(p.originalPrice)}</span>` : '');
   document.getElementById('detailDesc').textContent = p.description || '';
+  document.getElementById('detailDescLabel').style.display = p.description ? 'block' : 'none';
   document.getElementById('detailMainImg').src = imgs[0];
 
   const thumbs = document.getElementById('detailThumbs');
