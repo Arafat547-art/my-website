@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خدمة توصيل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef2f8; --card:#ffffff; --text:#122040; --muted:#6b7280;
+    --primary:#1768c2; --primary-dark:#0f52a0; --primary-light:#e9f2fc;
+    --navy:#0f3a73; --navy-2:#0c2f5c;
+    --green:#25d366; --green-dark:#1fb356;
+    --border:rgba(18,32,64,0.12);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1626; --card:#16223a; --text:#eef2f8; --muted:#9fb0c9;
+      --primary:#4d95e6; --primary-dark:#3c7dcc; --primary-light:#1d2c47;
+      --border:#2a3958;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1626; --card:#16223a; --text:#eef2f8; --muted:#9fb0c9;
+    --primary:#4d95e6; --primary-dark:#3c7dcc; --primary-light:#1d2c47;
+    --border:#2a3958;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Cairo', "Segoe UI", Tahoma, Arial, sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100%; padding:20px;
+  }
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:26px 24px; width:100%; max-width:420px;
+    box-shadow:0 10px 32px rgba(15,25,45,0.1);
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800;
+    color:var(--primary-dark); background:var(--primary-light); padding:5px 12px;
+    border-radius:999px; margin-bottom:12px;
+  }
+  h1{font-size:1.35rem; font-weight:900; margin:0 0 6px;}
+  p.sub{color:var(--muted); margin:0 0 22px; font-size:0.92rem; line-height:1.7;}
+  button{
+    width:100%; padding:14px; border:none; border-radius:11px;
+    font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer; margin-bottom:12px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:opacity .15s, transform .1s;
+  }
+  button:active{opacity:.85; transform:scale(.99);}
+  button:disabled{opacity:.5; cursor:not-allowed;}
+  #locateBtn{background:var(--primary); color:#fff;}
+  #locateBtn:hover{background:var(--primary-dark);}
+  #waBtn{background:var(--green); color:#fff;}
+  #waBtn:hover{background:var(--green-dark);}
+  #shareBtn{background:var(--primary-light); color:var(--primary-dark);}
+  #copyBtn{background:transparent; color:var(--primary); border:1.5px solid var(--primary);}
+  .status{
+    font-size:0.88rem; color:var(--muted); text-align:center;
+    min-height:20px; margin-bottom:10px;
+  }
+  .result{ display:none; margin-top:6px; }
+  .result.show{ display:block; }
+  .share-options{ display:none; margin-top:2px; }
+  .share-options.show{ display:block; }
+  .coords{
+    background:var(--bg); border:1px solid var(--border); border-radius:10px;
+    padding:10px 12px; font-size:0.85rem; word-break:break-all;
+    margin-bottom:10px; color:var(--text);
+  }
+  .map-wrap{
+    width:100%; border-radius:12px; overflow:hidden; border:1px solid var(--border);
+    margin-bottom:14px;
+  }
+  iframe{width:100%; height:220px; border:0; display:block;}
+  .accuracy{font-size:0.78rem; color:var(--muted); margin-top:-4px; margin-bottom:14px; text-align:center;}
+  .divider{height:1px; background:var(--border); margin:16px 0;}
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="badge">🚚 خدمة توصيل</span>
+  <h1>حدد موقعك وتواصل معنا</h1>
+  <p class="sub">اضغط لتحديد موقعك بدقة، بعدها تواصل مع خدمة التوصيل مباشرة عبر واتساب.</p>
+
+  <button id="locateBtn">🎯 حدد موقعي الآن</button>
+  <div class="status" id="status"></div>
+
+  <div class="result" id="result">
+    <div class="coords" id="coords"></div>
+    <div class="accuracy" id="accuracy"></div>
+    <div class="map-wrap">
+      <iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+    <button id="waBtn">💬 تواصل مع التوصيل عبر واتساب</button>
+
+    <div class="share-options" id="shareOptions">
+      <div class="divider"></div>
+      <button id="shareBtn">📤 مشاركة رابط الموقع</button>
+      <button id="copyBtn">📋 نسخ الرابط</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DELIVERY_WHATSAPP_NUMBER = '218915490710';
+
+const locateBtn = document.getElementById('locateBtn');
+const statusEl = document.getElementById('status');
+const resultEl = document.getElementById('result');
+const coordsEl = document.getElementById('coords');
+const accuracyEl = document.getElementById('accuracy');
+const mapFrame = document.getElementById('mapFrame');
+const waBtn = document.getElementById('waBtn');
+const shareOptions = document.getElementById('shareOptions');
+const shareBtn = document.getElementById('shareBtn');
+const copyBtn = document.getElementById('copyBtn');
+
+let mapsLink = '';
+
+locateBtn.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    statusEl.textContent = 'المتصفح لا يدعم تحديد الموقع.';
+    return;
+  }
+  locateBtn.disabled = true;
+  statusEl.textContent = 'جاري تحديد موقعك...';
+  resultEl.classList.remove('show');
+  shareOptions.classList.remove('show');
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+
+      mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+
+      coordsEl.textContent = `خط العرض: ${lat.toFixed(6)}  —  خط الطول: ${lng.toFixed(6)}`;
+      accuracyEl.textContent = `دقة التحديد: تقريبًا ${acc} متر`;
+      mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+
+      resultEl.classList.add('show');
+      statusEl.textContent = 'تم تحديد موقعك بنجاح ✅';
+      locateBtn.disabled = false;
+    },
+    (err) => {
+      let msg = 'تعذر تحديد الموقع.';
+      if (err.code === 1) msg = 'تم رفض إذن الوصول للموقع. فعّل الإذن من إعدادات المتصفح.';
+      else if (err.code === 2) msg = 'الموقع غير متاح حاليًا.';
+      else if (err.code === 3) msg = 'انتهت مهلة تحديد الموقع، حاول مرة أخرى.';
+      statusEl.textContent = msg;
+      locateBtn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+});
+
+waBtn.addEventListener('click', () => {
+  if (!mapsLink) return;
+  const text = `مرحبًا، أحتاج خدمة توصيل 🚚\nموقعي الحالي: ${mapsLink}`;
+  const url = `https://wa.me/${DELIVERY_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+  shareOptions.classList.add('show');
+});
+
+shareBtn.addEventListener('click', async () => {
+  if (!mapsLink) return;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'موقعي الحالي', text: 'هذا موقعي على خرائط قوقل:', url: mapsLink });
+    } catch (e) { /* المستخدم ألغى المشاركة */ }
+  } else {
+    try {
+      await navigator.clipboard.writeText(mapsLink);
+      statusEl.textContent = 'المشاركة غير مدعومة، تم نسخ الرابط بدلاً من ذلك 📋';
+    } catch (e) {
+      statusEl.textContent = 'تعذرت المشاركة والنسخ. الرابط: ' + mapsLink;
+    }
+  }
+});
+
+copyBtn.addEventListener('click', async () => {
+  if (!mapsLink) return;
+  try {
+    await navigator.clipboard.writeText(mapsLink);
+    copyBtn.textContent = '✅ تم النسخ!';
+    setTimeout(() => copyBtn.textContent = '📋 نسخ الرابط', 1800);
+  } catch (e) {
+    statusEl.textContent = 'تعذر النسخ التلقائي. الرابط: ' + mapsLink;
+  }
+});
+</script>
+</body>
+</html>
