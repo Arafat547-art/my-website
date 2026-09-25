@@ -108,13 +108,19 @@
   /* ============ Search ============ */
   .search-row{display:flex; gap:8px; padding:16px 16px 0;}
   .search-row .field{
-    flex:1; display:flex; align-items:center; gap:10px; background:var(--gray-light);
-    border:1.5px solid var(--line); border-radius:11px; padding:0 14px;
+    flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:8px; background:var(--gray-light);
+    border:1.5px solid var(--line); border-radius:11px; padding:0 12px;
   }
-  .search-row .field svg{width:18px; height:18px; color:var(--gray); flex:0 0 auto;}
-  .search-row input{flex:1; background:none; border:none; outline:none; padding:12px 0; font-size:13.5px; color:var(--ink);}
+  .search-row .field svg{width:17px; height:17px; color:var(--gray); flex:0 0 auto;}
+  .search-row input{flex:1; min-width:0; background:none; border:none; outline:none; padding:12px 0; font-size:13px; color:var(--ink);}
   .search-row input::placeholder{color:#95a0b3;}
-  .search-row .btn{padding:0 22px;}
+  .search-row .btn{padding:0 16px; flex:0 0 auto;}
+  #imageSearchBtn{
+    flex:0 0 44px; width:44px; height:44px; padding:0; border:none;
+    background:var(--blue-light); color:var(--blue-dark); border-radius:11px;
+  }
+  #imageSearchBtn svg{width:20px; height:20px;}
+  #imageSearchBtn:hover{background:#dcebfa;}
 
   /* ============ Delivery service banner ============ */
   .delivery-banner{
@@ -440,9 +446,9 @@
   <div class="search-row">
     <div class="field">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchInput" placeholder="ابحث عن دواء أو اسم العلامة التجارية ...">
+      <input type="text" id="searchInput" placeholder="بحث باسم">
     </div>
-    <button class="btn ghost" id="imageSearchBtn" title="بحث بصورة" style="padding:0 16px;">
+    <button class="btn ghost" id="imageSearchBtn" title="بحث بصورة">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l1.7-2.6A2 2 0 0 1 7.4 4.5h9.2a2 2 0 0 1 1.7 0.9L20 8"/><rect x="2.5" y="8" width="19" height="12" rx="2.5"/><circle cx="12" cy="14" r="3.5"/><line x1="17" y1="11.2" x2="17.01" y2="11.2"/></svg>
     </button>
     <input type="file" id="imageSearchInput" accept="image/*" style="display:none;">
