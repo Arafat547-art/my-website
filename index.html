@@ -1004,6 +1004,12 @@ function openDetail(id){
   const outOfStock = p.inStock === false;
   const ph = getPharmacy(p.pharmacyId);
 
+  /* تسجيل مشاهدة حقيقية: نزوّد حقل views في Firestore بواحد، ونحدّث الرقم محليًا فورًا */
+  db.collection(COLLECTION_NAME).doc(id).update({
+    views: firebase.firestore.FieldValue.increment(1)
+  }).catch(()=>{ /* لو الصلاحيات ما تسمحش بالكتابة، العداد هيفضل يعرض الرقم الحالي/الوهمي بدون أي خطأ ظاهر */ });
+  p.views = (typeof p.views === 'number' ? p.views : getViews(p)) + 1;
+
   document.getElementById('detailPharmacyTag').innerHTML = `🏥 ${ph.name||'صيدلية'}`;
   document.getElementById('detailTitle').textContent = p.title || '';
   document.getElementById('detailPack').textContent = p.pack ? ('📦 العبوة: ' + p.pack) : '';
